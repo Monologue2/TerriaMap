@@ -35,7 +35,7 @@ export default function UserInterface(props) {
       <MenuLeft>
         {aboutButtonHrefUrl ? (
           <MenuItem
-            caption="About"
+            caption="about"
             href={aboutButtonHrefUrl}
             key="about-link"
           />
