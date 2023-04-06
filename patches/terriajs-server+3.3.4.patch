@@ -1,0 +1,71 @@
+diff --git a/node_modules/terriajs-server/lib/controllers/ajax.js b/node_modules/terriajs-server/lib/controllers/ajax.js
+new file mode 100644
+index 0000000..42743d6
+--- /dev/null
++++ b/node_modules/terriajs-server/lib/controllers/ajax.js
+@@ -0,0 +1,37 @@
++var router = require('express').Router();
++
++//임시 데이터
++const users = [
++    {id : 1, name : "9bon"},
++    {id : 2, name : "shogle"},
++    {id : 3, name : "joyakdol"}
++];
++
++router.post('/', function(req, res) {
++    let parameters = req.body;
++})
++
++router.get('/', function(req, res) {
++    res.status(200).sendFile('/root/TerriaMap/wwwroot/ajax.html')
++})
++
++/** 
++    @path {Get} http://61.98.46.63:50001/ajax/users
++    @description 요청 데이터 값이 없고 반환 값만 있는 Get Method
++*/
++router.get('/api/users', function(req, res){
++    res.json({ok : true, users: users})
++})
++
++/**
++ * @path {GET} http://61.98.46.63:50001/ajax/api/users/user?user_id=1
++ * @description Qurey Params 요청 데이터 값이 존재함, 반환 값이 있는 Get Method
++ */
++router.get('/api/users/user', function(req, res){
++    const user_id = req.query.user_id
++    
++    const user = users.filter(data => data.id == user_id);
++    res.json({ok:false, user:user})
++})
++
++module.exports = router;
+\ No newline at end of file
+diff --git a/node_modules/terriajs-server/lib/makeserver.js b/node_modules/terriajs-server/lib/makeserver.js
+index cfcdfe2..fd43be3 100644
+--- a/node_modules/terriajs-server/lib/makeserver.js
++++ b/node_modules/terriajs-server/lib/makeserver.js
+@@ -9,6 +9,7 @@ var exists = require('./exists');
+ var basicAuth = require('basic-auth');
+ var fs = require('fs');
+ var ExpressBrute = require('express-brute');
++var ajaxRouter = require('./controllers/ajax');
+ 
+ /* Creates and returns a single express server. */
+ module.exports = function(options) {
+@@ -34,8 +35,14 @@ module.exports = function(options) {
+ 
+     // initialise app with standard middlewares
+     var app = express();
++
++    app.use(express.json());
++    app.use(express.urlencoded({extended:true}));
++
+     app.use(compression());
+     app.use(cors());
++    
++    app.use('/ajax', ajaxRouter);
+     app.disable('etag');
+     if (options.verbose) {
+         app.use(require('morgan')('dev'));
